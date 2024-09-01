@@ -11,7 +11,7 @@ class Property(models.Model):
         return self.name
 
 class Tenant(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     contact_details = models.CharField(max_length=255)
     property = models.ForeignKey(Property, on_delete=models.CASCADE)
 
@@ -19,10 +19,7 @@ class Tenant(models.Model):
         return self.name
 
 class Payment(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    tenant = models.CharField(max_length=255)
+    amount = models.FloatField()
     payment_date = models.DateField()
     settled = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Payment of {self.amount} by {self.tenant.name}"

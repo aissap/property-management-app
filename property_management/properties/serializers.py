@@ -12,14 +12,11 @@ class TenantSerializer(serializers.ModelSerializer):
         fields = ['name', 'contact_details', 'property']
 
 class PaymentSerializer(serializers.ModelSerializer):
-    tenant = serializers.PrimaryKeyRelatedField(queryset=Tenant.objects.all())
-
     class Meta:
         model = Payment
         fields = ['tenant', 'amount', 'payment_date', 'settled']
-
-    def validate(self, data):
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info('Validating data: %s', data)
-        return super().validate(data)
+    
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Amount must be greater than 0.")
+        return value

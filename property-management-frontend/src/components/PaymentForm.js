@@ -1,100 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { addPayment, getTenants } from '../api';
-import './Form.css';
+import { getTenants, addPayment } from '../services/api';
 
 const PaymentForm = () => {
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState('');
-  const [settled, setSettled] = useState(false);
-  const [tenant, setTenant] = useState('');
   const [tenants, setTenants] = useState([]);
+  const [selectedTenantId, setSelectedTenantId] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [paymentDate, setPaymentDate] = useState('');
+  const [settled, setSettled] = useState(false);
 
   useEffect(() => {
-    const fetchTenants = async () => {
+    async function fetchTenants() {
       try {
-        const tenantsData = await getTenants();
-        setTenants(tenantsData);
+        const tenantData = await getTenants();
+        setTenants(tenantData);
       } catch (error) {
-        console.error('Failed to fetch tenants:', error);
+        console.error('Error fetching tenants:', error);
       }
-    };
-
+    }
     fetchTenants();
   }, []);
 
-  const handleAddPayment = async (e) => {
-    e.preventDefault();
-  
-    if (!amount || !paymentDate || !tenant) {
-      alert('Please fill out all required fields.');
-      return;
-    }
-  
-    const data = {
-      tenant: parseInt(tenant, 10),
+  function handleTenantChange(event) {
+    setSelectedTenantId(event.target.value);
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const paymentData = {
+      tenant: selectedTenantId,
       amount: parseFloat(amount),
       payment_date: paymentDate,
-      settled
+      settled: settled
     };
-  
-    console.log('Sending data:', data);
-  
+
     try {
-      await addPayment(data);
-      setTenant('');
-      setAmount('');
-      setPaymentDate('');
-      setSettled(false);
-      alert('Payment added successfully!');
-      const updatedPayments = await getPayments();
-      setPayments(updatedPayments);
+      const response = await addPayment(paymentData);
+      console.log('Payment added successfully:', response);
     } catch (error) {
-      console.error('Failed to add payment:', error);
-      alert('Failed to add payment');
+      console.error('Error adding payment:', error);
     }
-  };
-  
-  
+  }
+
   return (
-    <div className="form-container">
-      <h2>Add Payment</h2>
-      <form onSubmit={handleSubmit}>
-        <input 
-          type="number" 
-          value={amount} 
-          onChange={(e) => setAmount(e.target.value)} 
-          placeholder="Amount" 
-          required 
+    <form onSubmit={handleSubmit}>
+      <select onChange={handleTenantChange} value={selectedTenantId}>
+        <option value="">Select a tenant</option>
+        {tenants.map(tenant => (
+          <option key={tenant.id} value={tenant.id}>
+            {tenant.name}
+          </option>
+        ))}
+      </select>
+      <input
+        type="number"
+        value={amount}
+        onChange={e => setAmount(e.target.value)}
+        placeholder="Amount"
+        required
+      />
+      <input
+        type="date"
+        value={paymentDate}
+        onChange={e => setPaymentDate(e.target.value)}
+        required
+      />
+      <label>
+        <input
+          type="checkbox"
+          checked={settled}
+          onChange={e => setSettled(e.target.checked)}
         />
-        <input 
-          type="date" 
-          value={date} 
-          onChange={(e) => setDate(e.target.value)} 
-          required 
-        />
-        <label>
-          <input 
-            type="checkbox" 
-            checked={settled} 
-            onChange={(e) => setSettled(e.target.checked)} 
-          />
-          Settled
-        </label>
-        <select 
-          value={tenant} 
-          onChange={(e) => setTenant(e.target.value)} 
-          required
-        >
-          <option value="">Select Tenant</option>
-          {tenants.map((tenant) => (
-            <option key={tenant.id} value={tenant.id}>
-              {tenant.name}
-            </option>
-          ))}
-        </select>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+        Settled
+      </label>
+      <button type="submit">Submit Payment</button>
+    </form>
   );
 };
 

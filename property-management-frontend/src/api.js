@@ -1,70 +1,75 @@
+import axios from 'axios';
+
 const API_URL = 'http://127.0.0.1:8000/api';
 
 export async function getProperties() {
-  const response = await fetch(`${API_URL}/properties/`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch properties');
+  try {
+    const response = await axios.get(`${API_URL}/properties/`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch properties:', error.response?.data || error.message);
+    throw error;
   }
-  return response.json();
 }
 
 export async function getTenants() {
-  const response = await fetch(`${API_URL}/tenants/`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch tenants');
+  try {
+    const response = await axios.get(`${API_URL}/tenants/`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch tenants:', error.response?.data || error.message);
+    throw error;
   }
-  return response.json();
 }
 
 export async function getPayments() {
-  const response = await fetch(`${API_URL}/payments/`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch payments');
+  try {
+    const response = await axios.get(`${API_URL}/payments/`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch payments:', error.response?.data || error.message);
+    throw error;
   }
-  return response.json();
 }
 
 export async function addProperty(data) {
-  const response = await fetch(`${API_URL}/properties/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to add property: ${errorText}`);
+  try {
+    const response = await axios.post(`${API_URL}/properties/`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to add property:', error.response?.data || error.message);
+    throw error;
   }
-  return response.json();
 }
 
 export async function addTenant(data) {
-  const response = await fetch(`${API_URL}/tenants/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to add tenant: ${errorText}`);
+  try {
+    const response = await axios.post(`${API_URL}/tenants/`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to add tenant:', error.response?.data || error.message);
+    throw error;
   }
-  return response.json();
 }
 
 export async function addPayment(data) {
-  const response = await fetch(`${API_URL}/payments/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to add payment: ${errorText}`);
+  try {
+    const response = await axios.post(`${API_URL}/payments/`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to add payment:', error.response?.data || error.message);
+    throw error;
   }
-  return response.json();
 }

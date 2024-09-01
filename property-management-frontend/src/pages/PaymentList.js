@@ -44,34 +44,36 @@ const PaymentList = () => {
     fetchTenants();
   }, []);
 
-  const handleAddPayment = async (e) => {
-    e.preventDefault();
-    if (!amount || !paymentDate || !tenant) {
-      alert('Please fill out all required fields.');
-      return;
-    }
+const handleAddPayment = async (e) => {
+  e.preventDefault();
+  if (!amount || !paymentDate || !tenant) {
+    alert('Please fill out all required fields.');
+    return;
+  }
 
-    const data = {
-      tenant: parseInt(tenant, 10),
-      amount: parseFloat(amount),
-      payment_date: paymentDate,
-      settled
-    };
-
-    try {
-      await addPayment(data);
-      setTenant('');
-      setAmount('');
-      setPaymentDate('');
-      setSettled(false);
-      alert('Payment added successfully!');
-      const updatedPayments = await getPayments();
-      setPayments(Array.isArray(updatedPayments) ? updatedPayments : []);
-    } catch (error) {
-      console.error('Failed to add payment:', error);
-      alert('Failed to add payment');
-    }
+  const data = {
+    tenant: tenant,  // Send tenant name as string
+    amount: parseFloat(amount),
+    payment_date: paymentDate,
+    settled
   };
+
+  try {
+    await addPayment(data);
+    setTenant('');
+    setAmount('');
+    setPaymentDate('');
+    setSettled(false);
+    alert('Payment added successfully!');
+    const updatedPayments = await getPayments();
+    setPayments(Array.isArray(updatedPayments) ? updatedPayments : []);
+  } catch (error) {
+    console.error('Failed to add payment:', error);
+    alert('Failed to add payment');
+  }
+};
+
+
 
   return (
     <div>
@@ -122,7 +124,8 @@ const PaymentList = () => {
           {payments.length > 0 ? (
             payments.map((payment) => (
               <li key={payment.id}>
-                {payment.amount} - {payment.payment_date} - {payment.settled ? 'Settled' : 'Unsettled'}
+                {/* Ensure unique key for each list item */}
+                {payment.tenant}: {payment.amount} on {payment.payment_date} - {payment.settled ? 'Settled' : 'Unsettled'}
               </li>
             ))
           ) : (
